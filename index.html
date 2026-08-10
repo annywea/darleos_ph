@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>дарлеос — в объективе</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --black:#0a0a09;
+  --black2:#111110;
+  --paper:#ece8e0;
+  --grey:#8a8880;
+  --grey-dim:#55534c;
+  --line:#2a2a26;
+  --accent:#5b90ac;
+  --accent-dim:#3a5c6c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--black);scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--paper);
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:default;
+}
+body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .hoverable{cursor:none;}
+::selection{background:var(--accent);color:var(--black);}
+
+.serif{font-family:'Fraunces',serif;}
+.mono{font-family:'IBM Plex Mono',monospace; letter-spacing:.02em;}
+
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--grey);
+}
+
+/* ---------- custom cursor ---------- */
+#cursor{
+  position:fixed; top:0; left:0; width:0; height:0; pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+}
+#cursor .ring{
+  position:absolute; top:0; left:0; transform:translate(-50%,-50%);
+  width:26px; height:26px; border:1px solid var(--paper); border-radius:50%;
+  transition:width .25s ease, height .25s ease, border-color .25s ease, opacity .25s ease;
+  opacity:.8;
+}
+#cursor .dot{
+  position:absolute; top:0; left:0; transform:translate(-50%,-50%);
+  width:3px; height:3px; background:var(--paper); border-radius:50%;
+}
+#cursor .label{
+  position:absolute; top:22px; left:0; transform:translate(-50%,0);
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em;
+  color:var(--accent); white-space:nowrap; opacity:0; transition:opacity .2s ease;
+  text-transform:uppercase;
+}
+#cursor.big .ring{width:64px;height:64px;border-color:var(--accent);}
+#cursor.big .label{opacity:1;}
+@media (pointer:coarse){ #cursor{display:none;} body.has-cursor{cursor:auto;} }
+
+/* ---------- placeholders ---------- */
+.ph{
+  position:relative; overflow:hidden; background:
+    radial-gradient(120% 140% at 20% 0%, #1c2226 0%, #101012 45%, #0a0a09 100%);
+}
+.ph::before{
+  content:""; position:absolute; inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.045'/></svg>");
+  mix-blend-mode:overlay; pointer-events:none;
+}
+.ph::after{
+  content:attr(data-name);
+  position:absolute; left:10px; bottom:10px;
+  font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.08em;
+  color:rgba(236,232,224,.28); pointer-events:none;
+}
+.ph-warm{background:radial-gradient(120% 140% at 80% 100%, #241d17 0%, #12100d 45%, #0a0a09 100%);}
+.ph-cool{background:radial-gradient(120% 140% at 10% 10%, #14202a 0%, #0d1013 45%, #0a0a09 100%);}
+
+.rimg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;}
+.rimg-contain{object-fit:cover; object-position:center 30%;}
+
+/* ---------- layout helpers ---------- */
+section{position:relative; width:100%;}
+.wrap{max-width:1280px; margin:0 auto; padding:0 6vw;}
+.hl{border-top:1px solid var(--line);}
+
+/* ---------- hero / viewfinder ---------- */
+#intro{height:100svh; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; text-align:center; overflow:hidden;}
+.hero-photo{position:absolute; inset:0; z-index:0; display:flex;}
+.hero-photo .half{position:relative; flex:1 1 50%; overflow:hidden;}
+.hero-photo .half img{width:100%; height:100%; object-fit:cover; object-position:center 22%; transform:scale(1.04);}
+.hero-photo::after{content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,9,.94) 0%, rgba(10,10,9,.32) 45%, rgba(10,10,9,.18) 100%); z-index:1;}
+.hero-photo .split-line{position:absolute; top:0; bottom:0; left:50%; width:1px; background:rgba(236,232,224,.18); z-index:1;}
+@media(max-width:640px){.hero-photo .half:nth-child(2){display:none;} .hero-photo .split-line{display:none;}}
+.blade{transform-origin:100px 100px; transition:transform .05s linear;}
+
+/* viewfinder HUD, anchored to the screen edges so the lens reads instantly */
+.hud{position:absolute; inset:18px; z-index:2; pointer-events:none;}
+.hud span.corner{position:absolute; width:22px; height:22px; border:1px solid var(--accent); opacity:.85;}
+.hud .hc-tl{top:0; left:0; border-right:none; border-bottom:none;}
+.hud .hc-tr{top:0; right:0; border-left:none; border-bottom:none;}
+.hud .hc-bl{bottom:0; left:0; border-right:none; border-top:none;}
+.hud .hc-br{bottom:0; right:0; border-left:none; border-top:none;}
+.hud .hc-read{position:absolute; top:0; left:34px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--grey);}
+.hud .hc-rec{position:absolute; top:0; right:34px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--grey); display:flex; align-items:center; gap:6px;}
+.hud .hc-rec i{width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.35;}50%{opacity:1;}}
+.hud .reticle{position:absolute; top:50%; left:50%; width:34px; height:34px; transform:translate(-50%,-50%); border:1px solid var(--grey); border-radius:50%; opacity:.35;}
+.hud .reticle::before,.hud .reticle::after{content:""; position:absolute; background:var(--grey);}
+.hud .reticle::before{top:50%; left:-10px; width:8px; height:1px;}
+.hud .reticle::after{top:50%; right:-10px; width:8px; height:1px;}
+
+.hero-content{position:relative; z-index:2; padding:0 6vw 9vh;}
+.intro-word{
+  font-family:'Fraunces',serif; font-style:italic; font-weight:400;
+  font-size:clamp(28px,5.4vw,64px); line-height:1.05; letter-spacing:-.01em;
+  overflow:hidden;
+}
+.intro-word span{display:inline-block; transform:translateY(110%);}
+
+.scroll-cue{position:absolute; bottom:34px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px; z-index:2;}
+.scroll-cue .track{width:1px; height:44px; background:var(--line); position:relative; overflow:hidden;}
+.scroll-cue .track i{position:absolute; top:-40%; left:0; width:100%; height:40%; background:var(--accent); animation:scrolldrop 1.8s ease-in-out infinite;}
+@keyframes scrolldrop{0%{top:-40%;}100%{top:100%;}}
+
+/* ---------- section 02 view ---------- */
+#view{padding:16vh 0; }
+.view-line{font-family:'Fraunces',serif; font-weight:400; font-size:clamp(22px,3.6vw,42px); line-height:1.28; color:var(--paper);}
+.view-line em{color:var(--grey); font-style:italic;}
+.view-grid{display:grid; grid-template-columns:1fr 1fr; gap:14vh 6vw; align-items:start; margin-top:10vh;}
+.view-figure{aspect-ratio:4/5;}
+@media(max-width:820px){.view-grid{grid-template-columns:1fr; gap:8vh;}}
+
+/* ---------- section 03 portfolio ---------- */
+#portfolio{padding:16vh 0 10vh;}
+.folio-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-auto-rows:11vw;
+  gap:1.4vw;
+  margin-top:8vh;
+}
+.folio-tile{position:relative; overflow:hidden; cursor:pointer;}
+.folio-tile .cap{
+  position:absolute; left:0; right:0; bottom:0; padding:18px 20px;
+  background:linear-gradient(to top, rgba(0,0,0,.82), transparent);
+  transform:translateY(100%); transition:transform .5s cubic-bezier(.16,1,.3,1);
+}
+.folio-tile:hover .cap{transform:translateY(0);}
+.folio-tile .cap .n{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--accent); letter-spacing:.14em;}
+.folio-tile .cap .t{font-family:'Fraunces',serif; font-style:italic; font-size:19px; margin-top:4px;}
+.folio-tile .frame-corners span{position:absolute; width:12px; height:12px; border:1px solid var(--accent); opacity:0; transition:opacity .4s ease;}
+.folio-tile:hover .frame-corners span{opacity:.9;}
+.fc-tl{top:8px;left:8px;border-right:none!important;border-bottom:none!important;}
+.fc-tr{top:8px;right:8px;border-left:none!important;border-bottom:none!important;}
+.fc-bl{bottom:8px;left:8px;border-right:none!important;border-top:none!important;}
+.fc-br{bottom:8px;right:8px;border-left:none!important;border-top:none!important;}
+
+.t2{grid-column:span 3;grid-row:span 3;}
+.t3{grid-column:span 3;grid-row:span 3;}
+.t5{grid-column:span 6;grid-row:span 5;}
+.t4{grid-column:span 3;grid-row:span 3;}
+.t8{grid-column:span 3;grid-row:span 3;}
+@media(max-width:820px){
+  .folio-grid{grid-template-columns:repeat(2,1fr); grid-auto-rows:58vw;}
+  .t2,.t3,.t4,.t8{grid-column:span 2; grid-row:span 1;}
+  .t5{grid-column:span 2; grid-row:span 2; aspect-ratio:3/2;}
+}
+
+/* ---------- section 04 signature ---------- */
+#signature{padding:18vh 0; text-align:center;}
+.sig-stage{position:relative; width:min(60vw,420px); aspect-ratio:1/1; margin:8vh auto 4vh; touch-action:none;}
+.sig-stage svg{width:100%;height:100%;}
+.sig-readout{display:flex; justify-content:center; gap:26px; margin-top:2vh;}
+.sig-readout .r-item{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.12em; color:var(--grey);}
+.sig-readout .r-item b{color:var(--accent); font-weight:500;}
+.sig-caption{font-family:'Fraunces',serif; font-style:italic; font-size:clamp(20px,2.6vw,30px); margin-top:5vh; opacity:.9; min-height:1.6em; transition:opacity .4s ease;}
+.sig-hint{margin-top:1.4vh;}
+.af-brackets span{position:absolute; width:26px; height:26px; border:1.5px solid var(--accent); opacity:0; transition:opacity .35s ease;}
+
+/* ---------- section 05 process ---------- */
+#process{padding:14vh 0 4vh;}
+.proc-strip{display:flex; gap:0; overflow-x:auto; scroll-snap-type:x proximity; padding:6vh 6vw; margin:0 -6vw; -ms-overflow-style:none; scrollbar-width:none;}
+.proc-strip::-webkit-scrollbar{display:none;}
+.proc-card{flex:0 0 min(62vw,300px); scroll-snap-align:start; padding-right:6vw; border-right:1px solid var(--line); margin-right:6vw;}
+.proc-card:last-child{border-right:none;}
+.proc-num{font-family:'Fraunces',serif; font-style:italic; font-size:clamp(30px,4vw,44px); color:var(--accent); line-height:1;}
+.proc-title{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin:16px 0 14px; color:var(--grey);}
+.proc-txt{color:var(--paper); font-size:15px; line-height:1.65; max-width:30ch; font-weight:300;}
+
+/* ---------- section 06 services ---------- */
+#services{padding:16vh 0; }
+.price-list{margin-top:8vh; border-top:1px solid var(--line);}
+.price-row{display:flex; justify-content:space-between; align-items:baseline; gap:4vw; padding:3.4vh 0; border-bottom:1px solid var(--line);}
+.price-row .p-name{font-family:'Fraunces',serif; font-style:italic; font-size:clamp(19px,2.4vw,28px);}
+.price-row .p-sum{font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--accent); white-space:nowrap;}
+.price-note{margin-top:2vh; color:var(--grey-dim); font-size:12.5px;}
+.svc-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:8vw; margin-top:10vh; align-items:start;}
+.svc-list{list-style:none;}
+.svc-list li{position:relative; padding-left:22px; margin-bottom:16px; color:var(--grey); font-size:14px; line-height:1.6; max-width:42ch;}
+.svc-list li::before{content:"—"; position:absolute; left:0; color:var(--accent);}
+.svc-terms{margin-top:6vh; padding-top:4vh; border-top:1px solid var(--line);}
+.svc-terms p{color:var(--grey-dim); font-size:12.5px; line-height:1.7; max-width:52ch; margin-bottom:8px;}
+@media(max-width:820px){.svc-grid{grid-template-columns:1fr; gap:5vh;} .price-row{flex-direction:column; align-items:flex-start; gap:6px;}}
+
+/* ---------- section 06 about ---------- */
+#about{padding:16vh 0;}
+.about-grid{display:grid; grid-template-columns:.8fr 1.2fr; gap:8vw; align-items:center;}
+.about-portrait{aspect-ratio:4/5;}
+.about-text{font-family:'Fraunces',serif; font-size:clamp(20px,2.4vw,28px); line-height:1.5; font-style:italic; color:var(--paper);}
+.about-meta{margin-top:5vh; display:flex; flex-direction:column; gap:8px;}
+@media(max-width:820px){.about-grid{grid-template-columns:1fr; gap:6vh;}}
+
+/* ---------- section 07 contact ---------- */
+#contact{padding:20vh 0 10vh; text-align:center;}
+.contact-line{font-family:'Fraunces',serif; font-weight:400; font-style:italic; font-size:clamp(34px,7vw,88px); line-height:1.02; letter-spacing:-.01em;}
+.contact-btn{
+  display:inline-flex; align-items:center; gap:12px; margin-top:6vh;
+  padding:18px 30px; border:1px solid var(--paper); border-radius:100px;
+  font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--paper); text-decoration:none; transition:background .35s ease, color .35s ease, border-color .35s ease;
+}
+.contact-btn:hover{background:var(--paper); color:var(--black);}
+.contact-sub{margin-top:5vh; color:var(--grey-dim); font-size:13px;}
+footer{padding:6vh 0; text-align:center; color:var(--grey-dim); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;}
+
+.reveal{opacity:0; transform:translateY(28px);}
+
+@media (prefers-reduced-motion: reduce){
+  * { animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"><div class="ring"></div><div class="dot"></div><div class="label"></div></div>
+
+<!-- ============ 01 INTRO ============ -->
+<section id="intro">
+  <div class="hero-photo">
+    <div class="half"><img src="images/hero-1.jpg" alt=""></div>
+    <div class="half"><img src="images/hero-2.jpg" alt=""></div>
+    <div class="split-line"></div>
+  </div>
+
+  <div class="hud">
+    <span class="corner hc-tl"></span><span class="corner hc-tr"></span>
+    <span class="corner hc-bl"></span><span class="corner hc-br"></span>
+    <span class="hc-read">35MM · F/2 · ISO 200</span>
+    <span class="hc-rec"><i></i>REC</span>
+    <span class="reticle"></span>
+  </div>
+
+  <div class="hero-content">
+    <h1 class="intro-word"><span id="w1">смотрю дольше, чем нужно</span></h1>
+    <p class="eyebrow reveal" id="introSub" style="margin-top:22px;">дарлеос · фотограф · краснодар</p>
+  </div>
+
+  <div class="scroll-cue">
+    <div class="track"><i></i></div>
+    <span class="mono" style="font-size:10px;color:var(--grey);letter-spacing:.14em;">SCROLL</span>
+  </div>
+</section>
+
+<!-- ============ 02 THE VIEW ============ -->
+<section id="view">
+  <div class="wrap">
+    <p class="eyebrow reveal">02 — взгляд</p>
+    <p class="view-line reveal" style="margin-top:5vh;">
+      Кадр начинается не с камеры. <em>Он начинается с того, на ком дольше задерживается взгляд.</em>
+    </p>
+
+    <div class="view-grid">
+      <div>
+        <p class="view-line reveal" style="font-size:clamp(18px,2.2vw,26px);">
+          Нежность, снятая без сентиментальности. <em>Улица — без случайности.</em> Ретро — без ностальгии.
+        </p>
+      </div>
+      <div class="ph view-figure reveal" data-name="editorial-01.jpg"></div>
+
+      <div class="ph view-figure reveal" data-name="editorial-02.jpg"></div>
+      <div>
+        <p class="view-line reveal" style="font-size:clamp(18px,2.2vw,26px);">
+          Хороший кадр — тот, где человек забыл, что его снимают. <em>Настроение всегда custom.</em>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 PORTFOLIO ============ -->
+<section id="portfolio">
+  <div class="wrap">
+    <p class="eyebrow reveal">03 — избранные работы</p>
+    <div class="folio-grid">
+      <div class="folio-tile t2 hoverable" data-cursor="OPEN">
+        <img class="rimg" src="images/editorial-01.jpg" alt="">
+        <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        <div class="cap"><div class="n">кадр · 01</div><div class="t">с цветком</div></div>
+      </div>
+      <div class="folio-tile t3 hoverable" data-cursor="OPEN">
+        <img class="rimg" src="images/portrait-01.jpg" alt="">
+        <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        <div class="cap"><div class="n">кадр · 02</div><div class="t">studio</div></div>
+      </div>
+      <div class="folio-tile t5 hoverable" data-cursor="OPEN">
+        <img class="rimg" src="images/editorial-02.jpg" alt="">
+        <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        <div class="cap"><div class="n">кадр · 03</div><div class="t">who's that girl?</div></div>
+      </div>
+      <div class="folio-tile t4 hoverable" data-cursor="OPEN">
+        <img class="rimg" src="images/editorial-03.jpg" alt="">
+        <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        <div class="cap"><div class="n">кадр · 04</div><div class="t">настроение: custom</div></div>
+      </div>
+      <div class="folio-tile t8 hoverable" data-cursor="OPEN">
+        <img class="rimg" src="images/street-01.jpg" alt="">
+        <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        <div class="cap"><div class="n">кадр · 05</div><div class="t">ноябрь. питер. зсд.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 SIGNATURE ============ -->
+<section id="signature" class="hl">
+  <div class="wrap">
+    <p class="eyebrow reveal">04 — радиус фокуса</p>
+    <p class="view-line reveal" style="margin-top:3vh; max-width:22ch; margin-left:auto; margin-right:auto;">
+      Потяните по кругу, чтобы навести фокус.
+    </p>
+
+    <div class="sig-stage hoverable" id="sigStage" data-cursor="FOCUS">
+      <svg viewBox="0 0 200 200" id="sigSvg">
+        <circle cx="100" cy="100" r="60" fill="var(--black2)"/>
+        <foreignObject x="30" y="30" width="140" height="140" clip-path="circle(0px at 100px 100px)" id="sigClipHolder">
+        </foreignObject>
+        <g id="sigBlades"></g>
+        <circle cx="100" cy="100" r="99" fill="none" stroke="var(--line)" stroke-width="1"/>
+        <circle cx="100" cy="100" r="90" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="1 7"/>
+      </svg>
+      <div id="sigImage" style="position:absolute; inset:9%; border-radius:50%; overflow:hidden; clip-path:circle(0% at 50% 50%); transition:clip-path .08s linear;">
+        <img src="images/portrait-03.jpg" alt="" style="width:100%;height:100%;object-fit:cover; filter:grayscale(1) contrast(1.05);">
+      </div>
+      <div class="af-brackets" id="afBrackets">
+        <span style="top:14%; left:14%; border-right:none; border-bottom:none;"></span>
+        <span style="top:14%; right:14%; border-left:none; border-bottom:none;"></span>
+        <span style="bottom:14%; left:14%; border-right:none; border-top:none;"></span>
+        <span style="bottom:14%; right:14%; border-left:none; border-top:none;"></span>
+      </div>
+    </div>
+
+    <div class="sig-readout mono">
+      <div class="r-item">ДИАФРАГМА <b id="fStop">f/16</b></div>
+      <div class="r-item">ФОКУС <b id="focusPct">4%</b></div>
+      <div class="r-item" id="focusState">— наведите —</div>
+    </div>
+
+    <p class="sig-caption" id="sigCaption">силуэт ещё не стал портретом</p>
+  </div>
+</section>
+
+<!-- ============ 05 PROCESS ============ -->
+<section id="process">
+  <div class="wrap" style="padding-bottom:0;"><p class="eyebrow reveal">05 — как проходит съёмка</p></div>
+  <div class="proc-strip">
+    <div class="proc-card reveal">
+      <div class="proc-num">01</div>
+      <div class="proc-title">Idea / Замысел</div>
+      <p class="proc-txt">Разговор до съёмки — не бриф, а сверка ощущений. Ищем не позу, а состояние.</p>
+    </div>
+    <div class="proc-card reveal">
+      <div class="proc-num">02</div>
+      <div class="proc-title">Mood / Настроение</div>
+      <p class="proc-txt">Свет, место, референсы — всё под один тон. Настроение здесь всегда custom.</p>
+    </div>
+    <div class="proc-card reveal">
+      <div class="proc-num">03</div>
+      <div class="proc-title">Shoot / Съёмка</div>
+      <p class="proc-txt">Меньше команд, больше пауз. Лучший кадр обычно случается между «готово» и «ещё раз».</p>
+    </div>
+    <div class="proc-card reveal">
+      <div class="proc-num">04</div>
+      <div class="proc-title">Frame / Кадр</div>
+      <p class="proc-txt">Отбор — самая честная часть работы. В кадр идёт то, что держит взгляд дольше секунды.</p>
+    </div>
+    <div class="proc-card reveal">
+      <div class="proc-num">05</div>
+      <div class="proc-title">Result / Результат</div>
+      <p class="proc-txt">Обработанные фото — в течение недели. За час съёмки получается 40+ кадров.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 SERVICES ============ -->
+<section id="services" class="hl">
+  <div class="wrap">
+    <p class="eyebrow reveal">06 — услуги и цены</p>
+    <p class="view-line reveal" style="margin-top:4vh; max-width:26ch;">Фотография — больше, чем картинка. Формат подбирается под вас, тариф — один и тот же.</p>
+
+    <div class="svc-grid">
+      <div>
+        <div class="price-list">
+          <div class="price-row reveal">
+            <span class="p-name">Портретная фотосессия</span>
+            <span class="p-sum">3 000 ₽ / час</span>
+          </div>
+          <div class="price-row reveal">
+            <span class="p-name">Уличная / прогулочная</span>
+            <span class="p-sum">3 000 ₽ / час</span>
+          </div>
+          <div class="price-row reveal">
+            <span class="p-name">Love story</span>
+            <span class="p-sum">5 000 ₽ / час</span>
+          </div>
+        </div>
+        <p class="price-note reveal mono">аренда студии и реквизита — отдельно · выезд по краснодару возможен</p>
+      </div>
+
+      <div class="reveal">
+        <p class="eyebrow" style="margin-bottom:16px;">что входит</p>
+        <ul class="svc-list">
+          <li>Обсуждаем концепцию, помогаю выбрать локацию или студию и образ</li>
+          <li>Помогаю с позированием на протяжении всей съёмки</li>
+          <li>Обработанные фото — в течение недели после съёмки</li>
+          <li>40+ кадров за час работы</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="svc-terms reveal">
+      <p>Дата и время бронируются предоплатой 1000 ₽ — без неё бронь не действует. Перенос возможен один раз, кроме переноса в день съёмки; в остальных случаях предоплата не возвращается.</p>
+      <p>Отдаю только обработанные фотографии — исходники не передаю.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 ABOUT ============ -->
+<section id="about" class="hl">
+  <div class="wrap">
+    <p class="eyebrow reveal">07 — дарлеос</p>
+    <div class="about-grid" style="margin-top:6vh;">
+      <div class="about-portrait reveal" style="position:relative; overflow:hidden;"><img class="rimg" src="images/portrait-04.jpg" alt=""></div>
+      <div>
+        <p class="about-text reveal">Я Даша — твой фотограф в Краснодаре. Для меня кадр — не просто картинка, а момент, к которому захочется вернуться спустя годы.</p>
+        <div class="about-meta reveal">
+          <span class="eyebrow">в объективе дарлеос 🧿</span>
+          <span class="eyebrow">@darleos_ph — telegram</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 CONTACT ============ -->
+<section id="contact">
+  <div class="wrap">
+    <p class="eyebrow reveal">08 — запись</p>
+    <p class="contact-line reveal" style="margin-top:4vh;">следующий кадр<br>ещё не снят</p>
+    <a class="contact-btn reveal hoverable" href="https://t.me/darleos" target="_blank" rel="noopener" data-cursor="TG">Записаться в Telegram →</a>
+    <p class="contact-sub reveal mono">по всем вопросам — @darleos</p>
+  </div>
+</section>
+
+<footer>В ОБЪЕКТИВЕ ДАРЛЕОС 🧿 — @darleos_ph</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ---------------- helper: build aperture blade shapes ---------------- */
+function buildBlades(container, count, cx, cy, R, colorVar){
+  const g = document.getElementById(container);
+  const NS='http://www.w3.org/2000/svg';
+  for(let i=0;i<count;i++){
+    const angle = (360/count)*i;
+    const poly = document.createElementNS(NS,'polygon');
+    poly.setAttribute('class','blade');
+    poly.setAttribute('fill', 'var(--black)');
+    poly.setAttribute('stroke', 'var(--line)');
+    poly.setAttribute('stroke-width','0.6');
+    poly.dataset.baseAngle = angle;
+    g.appendChild(poly);
+  }
+  return g;
+}
+function drawBlades(g, openAmt, cx, cy, R){
+  const blades = g.querySelectorAll('.blade');
+  const n = blades.length;
+  const closedInner = R*0.16; // how much they overlap when closed
+  const openInner = R*1.05;   // fully retracted
+  const inner = closedInner + (openInner-closedInner)*openAmt;
+  blades.forEach((b,i)=>{
+    const a0 = (360/n)*i * Math.PI/180;
+    const a1 = a0 + (360/n)*1.65 * Math.PI/180;
+    const p1x = cx + Math.cos(a0)*R, p1y = cy + Math.sin(a0)*R;
+    const p2x = cx + Math.cos(a1)*R, p2y = cy + Math.sin(a1)*R;
+    const p3x = cx + Math.cos((a0+a1)/2)*inner, p3y = cy + Math.sin((a0+a1)/2)*inner;
+    b.setAttribute('points', `${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y}`);
+  });
+}
+
+/* ---- signature aperture: draggable ---- */
+const sigG = buildBlades('sigBlades', 12, 100,100,116);
+let sigOpen = 0.04;
+drawBlades(sigG, sigOpen, 100,100,116);
+
+const sigStage = document.getElementById('sigStage');
+const sigImage = document.getElementById('sigImage');
+const focusPct = document.getElementById('focusPct');
+const fStop = document.getElementById('fStop');
+const focusState = document.getElementById('focusState');
+const sigCaption = document.getElementById('sigCaption');
+const afBrackets = document.getElementById('afBrackets');
+
+const fStops = ["f/22","f/16","f/11","f/8","f/5.6","f/4","f/2.8","f/2","f/1.4"];
+const captions = [
+  "силуэт ещё не стал портретом",
+  "контур проступает из темноты",
+  "черты становятся узнаваемы",
+  "взгляд встречается со взглядом",
+  "резкость найдена — можно снимать"
+];
+
+let dragging=false, lastAngle=0;
+function angleFromCenter(clientX, clientY){
+  const r = sigStage.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  return Math.atan2(clientY-cy, clientX-cx) * 180/Math.PI;
+}
+function updateSignature(){
+  drawBlades(sigG, sigOpen, 100,100,116);
+  const pct = Math.round(sigOpen*100);
+  focusPct.textContent = pct+"%";
+  fStop.textContent = fStops[Math.min(fStops.length-1, Math.floor(sigOpen*fStops.length))];
+  sigImage.style.clipPath = `circle(${(sigOpen*54)}% at 50% 50%)`;
+  const capIndex = Math.min(captions.length-1, Math.floor(sigOpen*captions.length));
+  if(sigCaption.textContent !== captions[capIndex]){
+    gsap.to(sigCaption,{opacity:0,duration:.15,onComplete:()=>{sigCaption.textContent=captions[capIndex]; gsap.to(sigCaption,{opacity:.9,duration:.25});}});
+  }
+  if(sigOpen>0.86){
+    focusState.textContent="▪ РЕЗКОСТЬ НАЙДЕНА";
+    focusState.style.color="var(--accent)";
+    afBrackets.querySelectorAll('span').forEach(s=>s.style.opacity=1);
+  } else {
+    focusState.textContent="— наведите —";
+    focusState.style.color="var(--grey)";
+    afBrackets.querySelectorAll('span').forEach(s=>s.style.opacity=0);
+  }
+}
+updateSignature();
+
+function startDrag(x,y){ dragging=true; lastAngle=angleFromCenter(x,y); }
+function moveDrag(x,y){
+  if(!dragging) return;
+  const a = angleFromCenter(x,y);
+  let delta = a-lastAngle;
+  if(delta>180) delta-=360; if(delta<-180) delta+=360;
+  sigOpen = Math.min(1, Math.max(0.03, sigOpen + delta/360));
+  lastAngle = a;
+  updateSignature();
+}
+function endDrag(){ dragging=false; }
+
+sigStage.addEventListener('pointerdown', e=>{ sigStage.setPointerCapture(e.pointerId); startDrag(e.clientX,e.clientY); });
+window.addEventListener('pointermove', e=> moveDrag(e.clientX,e.clientY));
+window.addEventListener('pointerup', endDrag);
+// gentle hint: slowly open a touch on load once visible
+ScrollTrigger.create({
+  trigger:"#signature", start:"top 70%", once:true,
+  onEnter:()=>{ gsap.to({v:sigOpen},{v:0.22, duration:1.6, ease:"power2.out",
+      onUpdate:function(){ sigOpen=this.targets()[0].v; updateSignature(); }}); }
+});
+
+/* ---------------- custom cursor ---------------- */
+const cursor = document.getElementById('cursor');
+const cursorLabel = cursor.querySelector('.label');
+let cx=0,cy=0,tx=0,ty=0;
+const isFine = window.matchMedia('(pointer:fine)').matches;
+if(isFine){
+  document.body.classList.add('has-cursor');
+  window.addEventListener('mousemove', e=>{ tx=e.clientX; ty=e.clientY; });
+  gsap.ticker.add(()=>{
+    cx += (tx-cx)*0.18; cy += (ty-cy)*0.18;
+    cursor.style.transform = `translate(${cx}px,${cy}px)`;
+  });
+  document.querySelectorAll('.hoverable').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>{
+      cursor.classList.add('big');
+      cursorLabel.textContent = el.dataset.cursor || 'VIEW';
+    });
+    el.addEventListener('mouseleave', ()=> cursor.classList.remove('big'));
+  });
+}
+
+/* ---------------- intro type-in ---------------- */
+const w1 = document.getElementById('w1');
+const txt = w1.textContent;
+w1.innerHTML = txt.split('').map(ch=>`<span>${ch===' '?'&nbsp;':ch}</span>`).join('');
+gsap.to('#w1 span', {y:'0%', duration:1, ease:'power4.out', stagger:0.018, delay:.3});
+gsap.to('#introSub', {opacity:1, y:0, duration:1, delay:1.1});
+gsap.fromTo('.hud', {opacity:0}, {opacity:1, duration:1.6, delay:.2});
+
+/* ---------------- scroll reveals ---------------- */
+gsap.utils.toArray('.reveal').forEach(el=>{
+  gsap.to(el, {
+    opacity:1, y:0, duration:1, ease:'power3.out',
+    scrollTrigger:{ trigger:el, start:'top 88%' }
+  });
+});
+
+/* subtle parallax on folio tiles */
+gsap.utils.toArray('.folio-tile').forEach(t=>{
+  gsap.fromTo(t, {y:26}, {y:0, duration:1.1, ease:'power3.out',
+    scrollTrigger:{trigger:t, start:'top 95%'}});
+});
+</script>
+</body>
+</html>
