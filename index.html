@@ -94,7 +94,7 @@ section{position:relative; width:100%;}
 .bokeh.b2{width:120px; height:120px; bottom:20%; right:12%; opacity:.6;}
 .bokeh.b3{width:90px; height:90px; top:60%; left:22%; opacity:.5;}
 
-.lens-wrap{position:relative; width:min(30vw,220px); aspect-ratio:1/1; z-index:2; cursor:pointer;}
+.lens-wrap{position:relative; width:min(34vw,260px); aspect-ratio:1/1; z-index:2; cursor:pointer;}
 .lens-wrap svg{width:100%; height:100%; display:block;}
 .blade{transform-origin:100px 100px;}
 .lens-ring{fill:none; stroke:var(--ink); stroke-width:.6;}
@@ -121,7 +121,11 @@ section{position:relative; width:100%;}
 .view-grid{display:grid; grid-template-columns:1fr 1fr; gap:14vh 6vw; align-items:start; margin-top:10vh;}
 .view-figure{width:100%; aspect-ratio:0.666; overflow:hidden; background:var(--surface);}
 .view-figure img{width:100%; height:100%; object-fit:cover;}
-@media(max-width:820px){.view-grid{grid-template-columns:1fr; gap:8vh;} .view-figure{max-width:340px; margin:0 auto;}}
+@media(max-width:820px){
+  .view-grid{grid-template-columns:1fr; gap:8vh;}
+  .view-figure{max-width:340px; margin:0 auto;}
+  .v-t1{order:1;} .v-f1{order:2;} .v-t2{order:3;} .v-f2{order:4;}
+}
 
 /* ---------- 03 portfolio — true-ratio editorial flow ---------- */
 #portfolio{padding:16vh 0 10vh;}
@@ -225,27 +229,28 @@ section{position:relative; width:100%;}
 
 /* ---------- 08 contact ---------- */
 #contact{padding:18vh 0 10vh; text-align:center; position:relative; overflow:hidden;}
-.contact-frame{position:absolute; inset:24px; border:1px solid var(--line); pointer-events:none;}
-.contact-frame span{position:absolute; width:16px; height:16px; border:1px solid var(--accent);}
+.contact-frame{position:absolute; inset:24px; border:1px solid var(--line); pointer-events:none; opacity:.6;}
+.contact-frame span{position:absolute; width:14px; height:14px; border:1px solid var(--accent); opacity:.55;}
 .cf-tl{top:-1px;left:-1px;border-right:none;border-bottom:none;}
 .cf-tr{top:-1px;right:-1px;border-left:none;border-bottom:none;}
 .cf-bl{bottom:-1px;left:-1px;border-right:none;border-top:none;}
 .cf-br{bottom:-1px;right:-1px;border-left:none;border-top:none;}
-.contact-coords{position:absolute; top:38px; left:50%; transform:translateX(-50%);}
-.contact-line{font-family:'Fraunces',serif; font-weight:400; font-style:italic; font-size:clamp(34px,7vw,88px); line-height:1.02; letter-spacing:-.01em; color:var(--ink); position:relative; z-index:2;}
+.contact-coords{position:absolute; top:38px; left:50%; transform:translateX(-50%); opacity:.55;}
+.contact-line{
+  font-family:'Fraunces',serif; font-weight:600; font-style:normal;
+  font-size:clamp(38px,8vw,96px); line-height:1.04; letter-spacing:-.01em; color:var(--ink);
+  position:relative; z-index:2;
+}
+.contact-rule{width:64px; height:2px; background:var(--accent); margin:5vh auto 0; position:relative; z-index:2;}
 .contact-btn{
-  display:inline-flex; align-items:center; gap:12px; margin-top:6vh;
+  display:inline-flex; align-items:center; gap:12px; margin-top:5vh;
   padding:18px 30px; border:1px solid var(--ink); border-radius:100px;
   font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase;
   color:var(--ink); text-decoration:none; transition:background .35s ease, color .35s ease;
   position:relative; z-index:2;
 }
 .contact-btn:hover{background:var(--ink); color:var(--bg);}
-.contact-sub{margin-top:5vh; position:relative; z-index:2;}
-.badge-ring{position:relative; width:150px; height:150px; margin:8vh auto 0;}
-.badge-ring svg{width:100%; height:100%; animation:spin 22s linear infinite;}
-.badge-ring .dot{position:absolute; top:50%; left:50%; width:6px; height:6px; margin:-3px; border-radius:50%; background:var(--accent);}
-@keyframes spin{to{transform:rotate(360deg);}}
+.contact-sub{margin-top:4vh; position:relative; z-index:2; opacity:.75;}
 
 footer{padding:6vh 0; text-align:center;}
 footer .data{display:block;}
@@ -268,21 +273,21 @@ footer .data{display:block;}
   <div class="hud">
     <span class="corner hc-tl"></span><span class="corner hc-tr"></span>
     <span class="corner hc-bl"></span><span class="corner hc-br"></span>
-    <span class="hc-read data">35MM · F/2 · ISO 200</span>
-    <span class="hc-loc data">55.7558°N 37.6173°E</span>
+    <span class="hc-read data">35MM · F/2 · ISO 200 · FRAME 01</span>
+    <span class="hc-loc data">45.0355°N 38.9753°E</span>
   </div>
 
   <div class="lens-wrap hoverable" id="heroLens" data-cursor="FOCUS">
     <svg viewBox="0 0 200 200">
       <circle class="lens-ring" cx="100" cy="100" r="99"/>
+      <circle class="lens-ring" cx="100" cy="100" r="70" opacity=".4"/>
       <circle class="lens-focusring" id="heroFocusRing" cx="100" cy="100" r="88"/>
       <g id="heroBlades"></g>
-      <circle class="lens-ring" cx="100" cy="100" r="6" fill="var(--accent)" stroke="none"/>
+      <circle class="lens-ring" cx="100" cy="100" r="5" fill="var(--accent)" stroke="none"/>
     </svg>
   </div>
 
   <div class="hero-content">
-    <h1 class="intro-word"><span id="w1">смотрю дольше, чем нужно</span></h1>
     <p class="kicker hero-sub reveal" id="introSub">дарлеос · фотограф · краснодар</p>
   </div>
 
@@ -301,15 +306,15 @@ footer .data{display:block;}
     </p>
 
     <div class="view-grid">
-      <div>
+      <div class="v-t1">
         <p class="view-line reveal" style="font-size:clamp(18px,2.2vw,26px);">
           Нежность, снятая без сентиментальности. <em>Улица — без случайности.</em> Ретро — без ностальгии.
         </p>
       </div>
-      <div class="view-figure reveal"><img src="Images/hero-1.jpg" alt=""></div>
+      <div class="view-figure reveal v-f1"><img src="Images/hero-1.jpg" alt=""></div>
 
-      <div class="view-figure reveal"><img src="Images/hero-2.jpg" alt=""></div>
-      <div>
+      <div class="view-figure reveal v-f2"><img src="Images/hero-2.jpg" alt=""></div>
+      <div class="v-t2">
         <p class="view-line reveal" style="font-size:clamp(18px,2.2vw,26px);">
           Хороший кадр — тот, где человек забыл, что его снимают. <em>Настроение всегда custom.</em>
         </p>
@@ -362,6 +367,22 @@ footer .data{display:block;}
           <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
         </div>
         <div class="folio-cap"><span class="fn">05</span><span class="ft">ноябрь. питер. зсд.</span></div>
+      </div>
+
+      <div class="folio-item reveal" style="width:23vw; max-width:270px;">
+        <div class="folio-tile hoverable" style="aspect-ratio:0.666;" data-cursor="OPEN" data-lb="5">
+          <img src="Images/portrait-03.jpg" alt="">
+          <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        </div>
+        <div class="folio-cap"><span class="fn">06</span><span class="ft">portrait</span></div>
+      </div>
+
+      <div class="folio-item reveal" style="width:31vw; max-width:360px;">
+        <div class="folio-tile hoverable" style="aspect-ratio:0.666;" data-cursor="OPEN" data-lb="6">
+          <img src="Images/portrait-04.jpg" alt="">
+          <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
+        </div>
+        <div class="folio-cap"><span class="fn">07</span><span class="ft">bordeaux</span></div>
       </div>
     </div>
   </div>
@@ -534,19 +555,10 @@ footer .data{display:block;}
 
   <div class="wrap">
     <p class="kicker reveal" style="position:relative; z-index:2;">запись</p>
-    <p class="contact-line reveal" style="margin-top:4vh;">следующий кадр<br>ещё не снят</p>
+    <p class="contact-line reveal" style="margin-top:5vh;">СЛЕДУЮЩИЙ КАДР<br>ЕЩЁ НЕ СНЯТ.</p>
+    <div class="contact-rule reveal"></div>
     <a class="contact-btn reveal hoverable" href="https://t.me/darleos" target="_blank" rel="noopener" data-cursor="TG">Записаться в Telegram →</a>
     <p class="contact-sub reveal data">по всем вопросам — @darleos</p>
-
-    <div class="badge-ring reveal">
-      <svg viewBox="0 0 150 150">
-        <defs><path id="badgeCircle" d="M 75,75 m -60,0 a 60,60 0 1,1 120,0 a 60,60 0 1,1 -120,0"/></defs>
-        <text font-family="IBM Plex Mono" font-size="8.4" letter-spacing="2.5" fill="var(--accent)">
-          <textPath href="#badgeCircle">• СЛЕДУЮЩИЙ КАДР — ТВОЙ ХОД • СЛЕДУЮЩИЙ КАДР — ТВОЙ ХОД </textPath>
-        </text>
-      </svg>
-      <span class="dot"></span>
-    </div>
   </div>
 </section>
 
@@ -588,13 +600,13 @@ function drawBlades(g, openAmt, cx, cy, R, fillColor, strokeColor){
 }
 
 /* ---- hero lens: idle breathing + click-to-snap toy interaction ---- */
-const heroG = buildBlades('heroBlades', 10, 100,100,84);
-let heroOpen = 0.62;
-drawBlades(heroG, heroOpen, 100,100,84, 'var(--bg)', 'var(--ink)');
+const heroG = buildBlades('heroBlades', 8, 100,100,84);
+let heroOpen = 0.3;
+drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none');
 
 const heroBreath = gsap.to({v:heroOpen}, {
-  v:0.78, duration:3.4, ease:"sine.inOut", repeat:-1, yoyo:true,
-  onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--bg)', 'var(--ink)'); }
+  v:0.4, duration:3.4, ease:"sine.inOut", repeat:-1, yoyo:true,
+  onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none'); }
 });
 gsap.to('#heroFocusRing', {rotation:360, transformOrigin:"50% 50%", duration:40, ease:"none", repeat:-1});
 
@@ -602,9 +614,9 @@ document.getElementById('heroLens').addEventListener('click', ()=>{
   heroBreath.pause();
   gsap.timeline()
     .to({v:heroOpen}, {v:0.06, duration:.22, ease:"power3.in",
-        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--bg)', 'var(--ink)'); }})
-    .to({v:heroOpen}, {v:0.7, duration:.5, ease:"elastic.out(1,0.55)",
-        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--bg)', 'var(--ink)'); },
+        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none'); }})
+    .to({v:heroOpen}, {v:0.35, duration:.5, ease:"elastic.out(1,0.55)",
+        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none'); },
         onComplete:()=> heroBreath.resume()});
 });
 
@@ -686,7 +698,9 @@ const lbData = [
   {src:'Images/portrait-01.jpg', title:'studio', n:'02'},
   {src:'Images/editorial-02.jpg', title:"who's that girl?", n:'03'},
   {src:'Images/editorial-03.jpg', title:'настроение: custom', n:'04'},
-  {src:'Images/street-01.jpg', title:'ноябрь. питер. зсд.', n:'05'}
+  {src:'Images/street-01.jpg', title:'ноябрь. питер. зсд.', n:'05'},
+  {src:'Images/portrait-03.jpg', title:'portrait', n:'06'},
+  {src:'Images/portrait-04.jpg', title:'bordeaux', n:'07'}
 ];
 let lbIndex = 0;
 const lightbox = document.getElementById('lightbox');
@@ -758,12 +772,8 @@ if(isFine){
   });
 }
 
-/* ---------------- intro type-in ---------------- */
-const w1 = document.getElementById('w1');
-const txt = w1.textContent;
-w1.innerHTML = txt.split('').map(ch=>`<span>${ch===' '?'&nbsp;':ch}</span>`).join('');
-gsap.to('#w1 span', {y:'0%', duration:1, ease:'power4.out', stagger:0.018, delay:.3});
-gsap.to('#introSub', {opacity:1, y:0, duration:1, delay:1.1});
+/* ---------------- intro reveal ---------------- */
+gsap.to('#introSub', {opacity:1, y:0, duration:1, delay:.6});
 
 /* ---------------- scroll reveals ---------------- */
 gsap.utils.toArray('.reveal').forEach(el=>{
