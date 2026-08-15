@@ -237,16 +237,20 @@ section{position:relative; width:100%;}
 .cf-br{bottom:-1px;right:-1px;border-left:none;border-top:none;}
 .contact-coords{position:absolute; top:38px; left:50%; transform:translateX(-50%); opacity:.55;}
 .contact-line{
-  font-family:'Fraunces',serif; font-weight:600; font-style:normal;
-  font-size:clamp(38px,8vw,96px); line-height:1.04; letter-spacing:-.01em; color:var(--ink);
+  font-family:'Fraunces',serif; font-weight:400; font-style:italic;
+  font-size:clamp(34px,7vw,88px); line-height:1.02; letter-spacing:-.01em; color:var(--ink);
   position:relative; z-index:2;
 }
 .contact-rule{width:64px; height:2px; background:var(--accent); margin:5vh auto 0; position:relative; z-index:2;}
+.contact-btn-wrap{position:relative; display:inline-block; margin-top:5vh; z-index:2;}
+.pulse-ring{position:absolute; inset:-2px; border:1.5px solid var(--accent); border-radius:100px; opacity:0; animation:pulseRing 2.6s ease-out infinite; pointer-events:none;}
+.pulse-ring.p2{animation-delay:1.3s;}
+@keyframes pulseRing{0%{transform:scale(1); opacity:.6;} 100%{transform:scale(1.4); opacity:0;}}
 .contact-btn{
-  display:inline-flex; align-items:center; gap:12px; margin-top:5vh;
+  display:inline-flex; align-items:center; gap:12px;
   padding:18px 30px; border:1px solid var(--ink); border-radius:100px;
   font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--ink); text-decoration:none; transition:background .35s ease, color .35s ease;
+  color:var(--ink); text-decoration:none; background:var(--bg); transition:background .35s ease, color .35s ease;
   position:relative; z-index:2;
 }
 .contact-btn:hover{background:var(--ink); color:var(--bg);}
@@ -273,17 +277,21 @@ footer .data{display:block;}
   <div class="hud">
     <span class="corner hc-tl"></span><span class="corner hc-tr"></span>
     <span class="corner hc-bl"></span><span class="corner hc-br"></span>
-    <span class="hc-read data">35MM · F/2 · ISO 200 · FRAME 01</span>
     <span class="hc-loc data">45.0355°N 38.9753°E</span>
   </div>
 
   <div class="lens-wrap hoverable" id="heroLens" data-cursor="FOCUS">
-    <svg viewBox="0 0 200 200">
-      <circle class="lens-ring" cx="100" cy="100" r="99"/>
-      <circle class="lens-ring" cx="100" cy="100" r="70" opacity=".4"/>
-      <circle class="lens-focusring" id="heroFocusRing" cx="100" cy="100" r="88"/>
+    <svg viewBox="0 0 200 200" style="overflow:visible;">
+      <circle class="lens-ring" cx="100" cy="100" r="99" stroke-width="1.4"/>
+      <circle class="lens-ring" cx="100" cy="100" r="90"/>
+      <circle class="lens-ring" cx="100" cy="100" r="60" opacity=".55"/>
+      <circle class="lens-ring" cx="100" cy="100" r="30" opacity=".35"/>
+      <circle class="lens-focusring" id="heroFocusRing" cx="100" cy="100" r="75"/>
       <g id="heroBlades"></g>
-      <circle class="lens-ring" cx="100" cy="100" r="5" fill="var(--accent)" stroke="none"/>
+      <circle class="lens-ring" cx="100" cy="100" r="4" fill="var(--accent)" stroke="none"/>
+      <g id="heroBird" opacity="0" transform="translate(154,56) scale(0.85)">
+        <path d="M -30,8 C -17,-13 -6,-13 0,0 C 6,-13 17,-13 30,8" fill="none" stroke="var(--accent)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
     </svg>
   </div>
 
@@ -334,7 +342,7 @@ footer .data{display:block;}
           <img src="Images/editorial-01.jpg" alt="">
           <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
         </div>
-        <div class="folio-cap"><span class="fn">01</span><span class="ft">с цветком</span></div>
+        <div class="folio-cap"><span class="fn">01</span><span class="ft">немножко нежности</span></div>
       </div>
 
       <div class="folio-item reveal" style="width:20vw; max-width:230px;">
@@ -370,19 +378,19 @@ footer .data{display:block;}
       </div>
 
       <div class="folio-item reveal" style="width:23vw; max-width:270px;">
-        <div class="folio-tile hoverable" style="aspect-ratio:0.666;" data-cursor="OPEN" data-lb="5">
-          <img src="Images/portrait-03.jpg" alt="">
+        <div class="folio-tile hoverable" style="aspect-ratio:0.694;" data-cursor="OPEN" data-lb="5">
+          <img src="Images/editorial-04.jpg" alt="">
           <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
         </div>
-        <div class="folio-cap"><span class="fn">06</span><span class="ft">portrait</span></div>
+        <div class="folio-cap"><span class="fn">06</span><span class="ft">автопортрет</span></div>
       </div>
 
-      <div class="folio-item reveal" style="width:31vw; max-width:360px;">
+      <div class="folio-item reveal" style="width:23vw; max-width:270px;">
         <div class="folio-tile hoverable" style="aspect-ratio:0.666;" data-cursor="OPEN" data-lb="6">
-          <img src="Images/portrait-04.jpg" alt="">
+          <img src="Images/portrait-05.jpg" alt="">
           <div class="frame-corners"><span class="fc-tl"></span><span class="fc-tr"></span><span class="fc-bl"></span><span class="fc-br"></span></div>
         </div>
-        <div class="folio-cap"><span class="fn">07</span><span class="ft">bordeaux</span></div>
+        <div class="folio-cap"><span class="fn">07</span><span class="ft">autumn</span></div>
       </div>
     </div>
   </div>
@@ -555,9 +563,13 @@ footer .data{display:block;}
 
   <div class="wrap">
     <p class="kicker reveal" style="position:relative; z-index:2;">запись</p>
-    <p class="contact-line reveal" style="margin-top:5vh;">СЛЕДУЮЩИЙ КАДР<br>ЕЩЁ НЕ СНЯТ.</p>
+    <p class="contact-line reveal" style="margin-top:5vh;">следующий кадр<br>ещё не снят</p>
     <div class="contact-rule reveal"></div>
-    <a class="contact-btn reveal hoverable" href="https://t.me/darleos" target="_blank" rel="noopener" data-cursor="TG">Записаться в Telegram →</a>
+    <div class="contact-btn-wrap reveal">
+      <span class="pulse-ring"></span>
+      <span class="pulse-ring p2"></span>
+      <a class="contact-btn hoverable" href="https://t.me/darleos" target="_blank" rel="noopener" data-cursor="TG">Записаться в Telegram →</a>
+    </div>
     <p class="contact-sub reveal data">по всем вопросам — @darleos</p>
   </div>
 </section>
@@ -600,24 +612,31 @@ function drawBlades(g, openAmt, cx, cy, R, fillColor, strokeColor){
 }
 
 /* ---- hero lens: idle breathing + click-to-snap toy interaction ---- */
-const heroG = buildBlades('heroBlades', 8, 100,100,84);
+const heroG = buildBlades('heroBlades', 8, 100,100,66);
 let heroOpen = 0.3;
-drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none');
+drawBlades(heroG, heroOpen, 100,100,66, 'var(--ink)', 'none');
 
 const heroBreath = gsap.to({v:heroOpen}, {
   v:0.4, duration:3.4, ease:"sine.inOut", repeat:-1, yoyo:true,
-  onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none'); }
+  onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,66, 'var(--ink)', 'none'); }
 });
 gsap.to('#heroFocusRing', {rotation:360, transformOrigin:"50% 50%", duration:40, ease:"none", repeat:-1});
 
+let heroBusy = false;
 document.getElementById('heroLens').addEventListener('click', ()=>{
+  if(heroBusy) return;
+  heroBusy = true;
   heroBreath.pause();
-  gsap.timeline()
-    .to({v:heroOpen}, {v:0.06, duration:.22, ease:"power3.in",
-        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none'); }})
-    .to({v:heroOpen}, {v:0.35, duration:.5, ease:"elastic.out(1,0.55)",
-        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,84, 'var(--ink)', 'none'); },
-        onComplete:()=> heroBreath.resume()});
+  const bird = document.getElementById('heroBird');
+  gsap.set(bird, {opacity:0, x:0, y:0, scale:0.85});
+
+  gsap.timeline({onComplete:()=>{ heroBusy=false; heroBreath.resume(); }})
+    .to({v:heroOpen}, {v:0.04, duration:.4, ease:"power2.inOut",
+        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,66, 'var(--ink)', 'none'); }})
+    .set(bird, {opacity:1})
+    .to(bird, {x:120, y:-95, scale:1.3, opacity:0, duration:1, ease:"power1.out"})
+    .to({v:heroOpen}, {v:0.3, duration:.6, ease:"power2.out",
+        onUpdate:function(){ heroOpen=this.targets()[0].v; drawBlades(heroG, heroOpen, 100,100,66, 'var(--ink)', 'none'); }}, "-=0.6");
 });
 
 /* ---- signature aperture: draggable, blur-to-focus ---- */
@@ -694,13 +713,13 @@ ScrollTrigger.create({
 
 /* ---------------- portfolio lightbox ---------------- */
 const lbData = [
-  {src:'Images/editorial-01.jpg', title:'с цветком', n:'01'},
+  {src:'Images/editorial-01.jpg', title:'немножко нежности', n:'01'},
   {src:'Images/portrait-01.jpg', title:'studio', n:'02'},
   {src:'Images/editorial-02.jpg', title:"who's that girl?", n:'03'},
   {src:'Images/editorial-03.jpg', title:'настроение: custom', n:'04'},
   {src:'Images/street-01.jpg', title:'ноябрь. питер. зсд.', n:'05'},
-  {src:'Images/portrait-03.jpg', title:'portrait', n:'06'},
-  {src:'Images/portrait-04.jpg', title:'bordeaux', n:'07'}
+  {src:'Images/editorial-04.jpg', title:'автопортрет', n:'06'},
+  {src:'Images/portrait-05.jpg', title:'autumn', n:'07'}
 ];
 let lbIndex = 0;
 const lightbox = document.getElementById('lightbox');
